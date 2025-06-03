@@ -1,3 +1,16 @@
+<?php
+// Include PHPMailer from the ../../master folder
+require_once __DIR__ . '/../../master/PHPMailer/src/PHPMailer.php';
+require_once __DIR__ . '/../../master/PHPMailer/src/SMTP.php';
+require_once __DIR__ . '/../../master/PHPMailer/src/Exception.php';
+
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
+
+
+// Create a new PHPMailer instance
+$mail = new PHPMailer(true);
+?>
 <div class="row">
   <div class="col-md-4">
     <div class="box box-solid">
@@ -42,7 +55,7 @@
       </div>
     <?php }else {  $gu=mysqli_fetch_array(mysqli_query($con,"SELECT * FROM guru where c_guru='$_GET[q]' "));  ?>
     	<div id="hilang" class="alert alert-info alert-dismissable">Memproses Pesan...</div>
-    	<div class="box box-primary box-solid direct-chat direct-chat-primary" style="">
+      <div class="box box-primary box-solid direct-chat direct-chat-primary">
         <div class="box-header">
           <h3 class="box-title">Percakapan Anda Dengan <?php echo $gu['nama']; ?></h3>
           <a class="pull-right"><i class="glyphicon glyphicon-remove-circle"></i></a>
@@ -62,7 +75,32 @@
           </form>
         </div><!-- /.box-footer-->  
       </div>
-    <?php } ?>
+    <?php 
+    try {
+    // Server settings
+    $mail->isSMTP();
+    $mail->Host       = 'smtp.gmail.com';
+    $mail->SMTPAuth   = true;
+    $mail->Username   = 'digitalalfatech@gmail.com';
+    $mail->Password   = 'shth jhcp uvzf lsef'; // Ganti dengan App Password Gmail yang sudah Anda buat di https://myaccount.google.com/apppasswords
+    $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+    $mail->Port       = 587;
+
+    // Sender and recipient
+    $mail->setFrom('digitalalfatech@gmail.com', 'Digital Alfatech');
+    $mail->addAddress('sovi5121@gmail.com', $gu['nama']);
+
+    // Content
+    $mail->isHTML(true);
+    $mail->Subject = 'Notifikasi untuk '. $gu['nama']  ;
+    $mail->Body    = 'Ini adalah email dari POLANSIS SMP Negeri 2 Tembelang. Anda telah menerima pesan baru dari wali murid.';
+
+    $mail->send();
+    echo "<script>alert('Email berhasil dikirim.');</script>";
+  } catch (Exception $e) {
+    echo "<script>alert('Email gagal dikirim. Error: {$mail->ErrorInfo}');</script>";
+  }}
+    ?>
     
  	</div>
 </div>

@@ -250,8 +250,12 @@ else{
   else if($act=='ranking'){
     $aak='';$bak='';$cak='';$dak='';$eak='';$fak='';$gak='class="active"';
   }
+  // Tambahkan untuk inputbukti
+  else if($act=='inputbukti'){
+    $aak='';$bak='';$cak='';$dak='';$eak='';$fak='';$gak='';$hak='class="active"';
+  }
   else{
-    $aak='';$bak='';$cak='';$dak='';$eak='';$fak='';$gak='';
+    $aak='';$bak='';$cak='';$dak='';$eak='';$fak='';$gak='';$hak='';
   }
 }
 //akhir navigasi aktif
@@ -294,6 +298,12 @@ else{
             <i class="glyphicon glyphicon-calendar"></i> <span>History</span>
           </a>
         </li>
+        <!-- Tambahkan menu Input Bukti -->
+        <li <?php echo isset($hak) ? $hak : ''; ?>>
+          <a href="<?php echo $basegu; ?>inputbukti">
+            <i class="glyphicon glyphicon-upload"></i> <span>Input Bukti Pelanggaran</span>
+          </a>
+        </li>
         <!-- <li <?php echo $gak; ?>>
           <a href="<?php echo $basegu; ?>ranking">
             <i class="glyphicon glyphicon-stats"></i> <span>Ranking Pelanggaran</span>
@@ -316,6 +326,12 @@ else{
     if($act=='inputpelanggaran'){
       require 'view/inputpel.php';
     }
+    else if($act=='inputbukti'){
+      require 'view/inputbukti.php';
+    }
+    else if($act=='nextinput' and empty($_POST['pilih'])){
+      require 'view/inputpel.php';
+    } 
     else if($act=='nextinput'){
       require 'view/nextinput.php';
     }
