@@ -30,7 +30,15 @@ $sea=mysqli_fetch_array(mysqli_query($con,"SELECT * FROM siswa where nisn='$s' o
   <div class="col-xs-12 col-md-8 col-lg-8">
     <div class="box box-info">
       <div class="box-header with-border">
-        <h3 class="box-title">&nbsp;Pelanggaran <?php echo $sea['nama'] ?></h3><span class="pull-right"><a target="_blank" class="btn bg-blue btn-sm" href="<?php echo $basegu.'print/printpelsiswa?siswa='.$sea['c_siswa']; ?>"><i class="glyphicon glyphicon-print"></i> Print</a></span>
+        <h3 class="box-title">&nbsp;Pelanggaran <?php echo $sea['nama'] ?></h3>
+        <span class="pull-right">
+            <a target="_blank" class="btn bg-blue btn-sm" href="<?php echo $basegu.'print/printpelsiswa?siswa='.$sea['c_siswa']; ?>">
+          <i class="glyphicon glyphicon-print"></i> Print
+            </a>
+            <a class="btn bg-green btn-sm" href="<?php echo $basegu.'pesan/'.$wali['c_orangtua'].'/_'; ?>">
+          <i class="glyphicon glyphicon-envelope"></i> Pesan ke Wali Murid
+            </a>
+        </span>
       </div>
       <div class="box-body">
         <table id="example3" class="table table-hover">
