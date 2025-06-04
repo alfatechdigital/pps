@@ -49,6 +49,7 @@ else{
       }
     }
     $_SESSION['pesan']='selesai';
+    
     header('location:../../history');
   }
   else if($akh==md5('tambahchat')){
@@ -67,5 +68,59 @@ else{
     //header('location:../../login');
     echo "string";
   }
+}
+
+// Setelah data pelanggaran berhasil disimpan
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
+
+require_once __DIR__ . '/../../master/PHPMailer/src/PHPMailer.php';
+require_once __DIR__ . '/../../master/PHPMailer/src/SMTP.php';
+require_once __DIR__ . '/../../master/PHPMailer/src/Exception.php';
+
+// Ambil data siswa dan pelanggaran dari form
+$siswa_nama = $siswa['nama'];
+$siswa_nisn = $siswa['nisn'];
+$siswa_kelas = $kelas['kelas'];
+$pelanggaran = [];
+if (!empty($_POST['pilihben'])) {
+    foreach ($_POST['pilihben'] as $idben) {
+        $ben = mysqli_fetch_array(mysqli_query($con, "SELECT * FROM benpel WHERE c_benpel='$idben'"));
+        $pelanggaran[] = $ben['benpel'] . " (Bobot: " . $ben['bobot'] . ")";
+    }
+}
+$isi_email = "
+Data Pelanggaran Siswa:<br>
+Nama: $siswa_nama<br>
+NISN: $siswa_nisn<br>
+Kelas: $siswa_kelas<br>
+Pelanggaran:<br>
+<ul>";
+foreach($pelanggaran as $p){
+    $isi_email .= "<li>$p</li>";
+}
+$isi_email .= "</ul>";
+
+$mail = new PHPMailer(true);
+try {
+    $mail->isSMTP();
+    $mail->Host       = 'smtp.gmail.com';
+    $mail->SMTPAuth   = true;
+    $mail->Username   = 'digitalalfatech@gmail.com';
+    $mail->Password   = 'shth jhcp uvzf lsef'; // Ganti dengan app password Gmail
+    $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+    $mail->Port       = 587;
+
+    $mail->setFrom('digitalalfatech@gmail.com', 'Digital Alfatech');
+    $mail->addAddress('digitalalfatech@gmail.com', 'Admin'); // Ganti dengan email tujuan
+
+    $mail->isHTML(true);
+    $mail->Subject = 'Laporan Pelanggaran Siswa';
+    $mail->Body    = $isi_email;
+
+    $mail->send();
+    // echo "Email terkirim!";
+} catch (Exception $e) {
+    // echo "Email gagal: {$mail->ErrorInfo}";
 }
 ?>

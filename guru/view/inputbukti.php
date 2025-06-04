@@ -17,9 +17,7 @@
                     <a target="_blank" class="btn bg-blue btn-sm" href="<?php echo $basegu.'print/printpelguru?guru='.$_SESSION['c_guru'].''; ?>">
                         <i class="glyphicon glyphicon-print"></i> Print
                     </a>
-                    <button class="btn btn-success btn-sm" data-toggle="modal" data-target="#uploadBuktiModal">
-                        <i class="glyphicon glyphicon-upload"></i> Upload Bukti
-                    </button>
+                    
                 </span>
 
                 <!-- Modal Upload Bukti -->
@@ -32,7 +30,7 @@
                                     <h4 class="modal-title" id="uploadBuktiLabel">Upload Bukti Pelanggaran</h4>
                                 </div>
                                 <div class="modal-body">
-                                    <div class="form-group">
+                                    <!-- <div class="form-group">
                                         <label for="c_siswa">Nama Siswa</label>
                                         <select class="form-control" name="c_siswa" id="c_siswa" required>
                                             <option value="">-- Pilih Siswa --</option>
@@ -43,7 +41,7 @@
                                                 }
                                             ?>
                                         </select>
-                                    </div>
+                                    </div> -->
                                     <div class="form-group">
                                         <label for="bukti">Upload Bukti (Drag & Drop atau Klik)</label>
                                         <div id="drop-area" style="border:2px dashed #ccc; padding:20px; text-align:center; cursor:pointer;">
@@ -116,37 +114,41 @@
                 });
                 </script>
 
-                <?php
-                // Proses upload bukti
-                if(isset($_POST['upload_bukti'])) {
-                    $c_siswa = mysqli_real_escape_string($con, $_POST['c_siswa']);
-                    if(isset($_FILES['bukti']) && $_FILES['bukti']['error'] == 0) {
-                        $uploadDir = __DIR__ . '/../uploads/';
-                        if(!is_dir($uploadDir)) {
-                            mkdir($uploadDir, 0777, true);
-                        }
-                        $fileName = basename($_FILES['bukti']['name']);
-                        $fileTmp = $_FILES['bukti']['tmp_name'];
-                        $fileExt = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
-                        $allowed = array('jpg','jpeg','png','pdf','doc','docx');
-                        if(in_array($fileExt, $allowed)) {
-                            $newName = uniqid('bukti_', true) . '.' . $fileExt;
-                            $targetFile = $uploadDir . $newName;
-                            if(move_uploaded_file($fileTmp, $targetFile)) {
-                                // Simpan ke database jika perlu, contoh:
-                                // mysqli_query($con, "INSERT INTO bukti_pelanggaran (c_siswa, file_bukti, tgl_upload) VALUES ('$c_siswa', '$newName', NOW())");
-                                echo '<div class="alert alert-success">Bukti berhasil diupload.</div>';
-                            } else {
-                                echo '<div class="alert alert-danger">Gagal upload file.</div>';
-                            }
+            <?php
+            // Proses upload bukti
+            if(isset($_POST['upload_bukti']) && isset($_POST['c_siswa_upload'])) {
+                $c_siswa_upload = $_POST['c_siswa_upload'];
+                // Ambil nama siswa
+                $ds = mysqli_fetch_array(mysqli_query($con, "SELECT * FROM siswa WHERE c_siswa='$c_siswa_upload'"));
+                $nama_siswa = preg_replace('/[^a-zA-Z0-9_\-]/', '_', $ds['nama']); // sanitize nama folder
+
+                $uploadDir = __DIR__ . '/../uploads/' . $nama_siswa . '/';
+                if(!is_dir($uploadDir)) {
+                    mkdir($uploadDir, 0777, true);
+                }
+                if(isset($_FILES['bukti']) && $_FILES['bukti']['error'] == 0) {
+                    $fileName = basename($_FILES['bukti']['name']);
+                    $fileTmp = $_FILES['bukti']['tmp_name'];
+                    $fileExt = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
+                    $allowed = array('jpg','jpeg','png','pdf','doc','docx');
+                    if(in_array($fileExt, $allowed)) {
+                        $newName = uniqid('bukti_', true) . '.' . $fileExt;
+                        $targetFile = $uploadDir . $newName;
+                        if(move_uploaded_file($fileTmp, $targetFile)) {
+                            // Simpan ke database jika perlu
+                            // mysqli_query($con, "INSERT INTO bukti_pelanggaran (c_siswa, file_bukti, tgl_upload) VALUES ('$c_siswa_upload', '$newName', NOW())");
+                            echo '<div class="alert alert-success">Bukti berhasil diupload ke folder siswa.</div>';
                         } else {
-                            echo '<div class="alert alert-danger">Format file tidak didukung.</div>';
+                            echo '<div class="alert alert-danger">Gagal upload file.</div>';
                         }
                     } else {
-                        echo '<div class="alert alert-danger">File tidak ditemukan.</div>';
+                        echo '<div class="alert alert-danger">Format file tidak didukung.</div>';
                     }
+                } else {
+                    echo '<div class="alert alert-danger">File tidak ditemukan.</div>';
                 }
-                ?>
+            }
+            ?>        
             </div>        <!-- /.box-header -->
             <div class="box-body table-responsive">
               <table id="example1" class="table table-bordered table-hover">
@@ -161,11 +163,15 @@
                 </tr>
                 </thead>
                 <tbody>
-<?php $smk=mysqli_query($con,"SELECT * FROM pelanggaran where c_guru='$_SESSION[c_guru]' order by at desc ");$vr=1;while($akh=mysqli_fetch_array($smk)){
-$sis=mysqli_fetch_array(mysqli_query($con,"SELECT * FROM siswa where c_siswa='$akh[c_siswa]' "));
-$kel=mysqli_fetch_array(mysqli_query($con,"SELECT * FROM kelas where c_kelas='$akh[c_kelas]' "));
-$ben=mysqli_fetch_array(mysqli_query($con,"SELECT * FROM benpel where c_benpel='$akh[c_benpel]' "));
-?>
+            <?php 
+            $smk=mysqli_query($con,"SELECT * FROM pelanggaran where c_guru='$_SESSION[c_guru]' order by at desc ");
+            $vr=1;
+            while($akh=mysqli_fetch_array($smk)){
+                $sis=mysqli_fetch_array(mysqli_query($con,"SELECT * FROM siswa where c_siswa='$akh[c_siswa]' "));
+                $kel=mysqli_fetch_array(mysqli_query($con,"SELECT * FROM kelas where c_kelas='$akh[c_kelas]' "));
+                $ben=mysqli_fetch_array(mysqli_query($con,"SELECT * FROM benpel where c_benpel='$akh[c_benpel]' "));
+                $nama_siswa = preg_replace('/[^a-zA-Z0-9_\-]/', '_', $sis['nama']);
+            ?>
                 <tr>
                   <td><?php echo $vr; ?></td>
                   <td><?php echo $sis['nama']; ?><br>(<?php echo $kel['kelas']; ?>)</td>
@@ -173,23 +179,64 @@ $ben=mysqli_fetch_array(mysqli_query($con,"SELECT * FROM benpel where c_benpel='
                   <td><?php echo $akh['bobot']; ?></td>
                   <td><?php echo date("d/m/Y", strtotime($akh['at'])); ?></td>
                   <td align="center">
-                  <a class="btn btn-danger btn-sm" data-target="#hapus<?php echo $akh['c_pelanggaran']; ?>" data-toggle="modal"><i class="glyphicon glyphicon-remove"></i></a></td>
+                    <button 
+                        class="btn btn-success btn-sm upload-bukti-btn" 
+                        data-toggle="modal" 
+                        data-target="#uploadBuktiModal" 
+                        data-c_siswa="<?php echo $sis['c_siswa']; ?>" 
+                        data-nama_siswa="<?php echo $nama_siswa; ?>"
+                    >
+                        <i class="glyphicon glyphicon-upload"></i> Upload Bukti
+                    </button>
+                    <a class="btn btn-danger btn-sm" data-target="#hapus<?php echo $akh['c_pelanggaran']; ?>" data-toggle="modal"><i class="glyphicon glyphicon-remove"></i></a>
+                  </td>
                 </tr>
-<div id="hapus<?php echo $akh['c_pelanggaran']; ?>" class="modal" tabindex="-2" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-<div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-            <h4 class="modal-title" id="myModalLabel">Konfirmasi Hapus Pelanggaran Siswa</h4>
-        </div>
-        <div class="modal-footer">
-          <a href="<?php echo $basegu; ?>g-control/<?php echo md5('hapuspel').'/'.$akh['c_pelanggaran'];?>" class="btn btn-primary btn-circle"><i class="glyphicon glyphicon-ok"></i> Lanjutkan</a> 
-          <button class="btn btn-danger" data-dismiss="modal"><i class="glyphicon glyphicon-remove"></i> Tutup</button>
-        </div>
-        </div>
-    </div>
-</div>
-<?php $vr++; } ?>
+            <div id="hapus<?php echo $akh['c_pelanggaran']; ?>" class="modal" tabindex="-2" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                  <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                        <h4 class="modal-title" id="myModalLabel">Konfirmasi Hapus Pelanggaran Siswa</h4>
+                    </div>
+                    <div class="modal-footer">
+                      <a href="<?php echo $basegu; ?>g-control/<?php echo md5('hapuspel').'/'.$akh['c_pelanggaran'];?>" class="btn btn-primary btn-circle"><i class="glyphicon glyphicon-ok"></i> Lanjutkan</a> 
+                      <button class="btn btn-danger" data-dismiss="modal"><i class="glyphicon glyphicon-remove"></i> Tutup</button>
+                    </div>
+                    </div>
+                </div>
+            </div>
+            <?php $vr++; } ?>
+                </tbody>
+              </table>
+            </div>
+            <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                // Untuk mengisi input hidden c_siswa_upload pada modal saat tombol upload diklik
+                var uploadButtons = document.querySelectorAll('.upload-bukti-btn');
+                uploadButtons.forEach(function(btn) {
+                    btn.addEventListener('click', function() {
+                        var cSiswa = btn.getAttribute('data-c_siswa');
+                        // Set value ke input hidden di modal
+                        var inputSiswa = document.getElementById('c_siswa_upload');
+                        if(inputSiswa) inputSiswa.value = cSiswa;
+                    });
+                });
+            });
+            </script>
+            <!-- Tambahkan input hidden pada form modal upload bukti -->
+            <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                var form = document.getElementById('formUploadBukti');
+                if(form && !document.getElementById('c_siswa_upload')) {
+                    var input = document.createElement('input');
+                    input.type = 'hidden';
+                    input.name = 'c_siswa_upload';
+                    input.id = 'c_siswa_upload';
+                    form.appendChild(input);
+                }
+            });
+            </script>
+<?php $vr++;  ?>
                 </tbody>
               </table>
             </div>
