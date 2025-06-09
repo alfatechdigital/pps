@@ -81,13 +81,13 @@ $mail = new PHPMailer(true);
     $mail->isSMTP();
     $mail->Host       = 'smtp.gmail.com';
     $mail->SMTPAuth   = true;
-    $mail->Username   = 'digitalalfatech@gmail.com';
-    $mail->Password   = 'shth jhcp uvzf lsef'; // Ganti dengan App Password Gmail yang sudah Anda buat di https://myaccount.google.com/apppasswords
+    $mail->Username   = 'amelnanda105@gmail.com';
+    $mail->Password   = 'cbiu smrj kvxp uyej'; // Ganti dengan App Password Gmail yang sudah Anda buat di https://myaccount.google.com/apppasswords
     $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
     $mail->Port       = 587;
 
     // Sender and recipient
-    $mail->setFrom('digitalalfatech@gmail.com', 'Digital Alfatech');
+    $mail->setFrom('amelnanda105@gmail.com', 'walimurid');
     $mail->addAddress('sovi5121@gmail.com', $gu['nama']);
 
     // Content

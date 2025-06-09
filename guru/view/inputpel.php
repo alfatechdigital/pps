@@ -129,7 +129,7 @@ if (!empty($_POST['namanisn'])) {
                   <input type="hidden" name="namanisn" value="<?php echo htmlspecialchars($keyword); ?>">
                   <table class="table table-bordered table-hover">
                     <tr>
-                      <th>Pilih</th>
+                      <th>Opsi</th>
                       <th>NISN</th>
                       <th>Nama</th>
                       <th>Kelas</th>
@@ -138,7 +138,11 @@ if (!empty($_POST['namanisn'])) {
                         $kelas = mysqli_fetch_array(mysqli_query($con, "SELECT * FROM kelas WHERE c_kelas='".$siswa['c_kelas']."'"));
                     ?>
                     <tr>
-                      <td><button type="submit" name="pilihsis" value="<?php echo $siswa['c_siswa']; ?>" class="btn btn-primary btn-xs">Pilih</button></td>
+                        <td>
+                          <button type="button" class="btn btn-info btn-xs" onclick="navigator.clipboard.writeText('<?php echo htmlspecialchars($siswa['nisn'], ENT_QUOTES); ?>');">
+                            Copy NISN
+                          </button>
+                        </td>
                       <td><?php echo $siswa['nisn']; ?></td>
                       <td><?php echo $siswa['nama']; ?></td>
                       <td><?php echo $kelas['kelas']; ?></td>
