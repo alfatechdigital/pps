@@ -1,8 +1,8 @@
 <?php
 require '../../php/config.php'; require '../../php/function.php';
 session_start();
-if(empty($_SESSION['c_orangtua'])){header('location:'.$base.'');}
-require_once("../../master/dompdf/dompdf_config.inc.php"); require 'cssprint.php';
+if(empty($_SESSION['c_orangtua'])){header('location:'.$base.'');} 
+require_once("../../master/dompdf/autoload.inc.php"); require 'cssprint.php';
 $sis=mysqli_fetch_array(mysqli_query($con,"SELECT * FROM siswa where c_siswa='$_GET[siswa]' "));
 $content.='
 <title>Pelanggaran ('.$sis['nama'].')</title>
